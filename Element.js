@@ -1,24 +1,7 @@
 'use strict'
 
 class Element {
-
-  static styleSheet (href) {
-    return Element('link', {
-      rel           :   'stylesheet',
-      type          :   'text/css',
-      href          :   href,
-      $selfClosing  :   true
-    })
-  }
-
-  static importScript (src) {
-    return Element('script', { src : src });
-  }
-
-  static title (title) {
-    return Element('title', { $text: title });
-  }
-
+  
   static resolve (selector) {
     var resolved = { classes: [], attr: {} };
 
