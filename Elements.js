@@ -32,39 +32,31 @@ class Elements {
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   find (selector) {
-    var found = [];
+    let found = []
 
-    this.elements.forEach(function (child) {
-      child.find(selector).each(function (result) {
-        found.push(result);
-      });
-    });
+    this.elements.forEach(child => 
+      child.find(selector).each(found.push.bind(found))
+    )
 
-    return new Elements(found);
+    return new Elements(...found)
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   render (props, tab) {
     return this.elements
+      
       .map(element => {
-        if ( element instanceof Element ) {
-          return element.render(props, tab);
-        }
-
-        if ( element instanceof Elements ) {
-          return element.render(props, tab);
-        }
-        
         if ( typeof element === 'function' ) {
-
-          var elem = element(props);
-
-          if ( elem instanceof Element || elem instanceof Elements ) {
-            return elem.render(props, tab);
-          }
+          element = element(props);
         }
+        return element;
       })
+
+      .filter(element => element instanceof Element || element instanceof Elements)
+
+      .map(element => element.render(props, tab))
+
       .join("\n")
   }
 

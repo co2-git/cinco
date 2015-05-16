@@ -36,12 +36,12 @@ function render (child, props, tab) {
 
   var cont = true;
 
-  if ( typeof child.attr.$condition === 'function' ) {
-    cont = child.attr.$condition(props);
+  if ( typeof child.attributes.$condition === 'function' ) {
+    cont = child.attributes.$condition(props);
   }
 
-  else if ( typeof child.attr.$condition === 'boolean' ) {
-    cont = child.attr.$condition;
+  else if ( typeof child.attributes.$condition === 'boolean' ) {
+    cont = child.attributes.$condition;
   }
 
   if ( ! cont ) {
@@ -58,17 +58,17 @@ function render (child, props, tab) {
 
   // Class
 
-  child.attr.className = (child.attr.className || []);
+  child.attributes.className = (child.attributes.className || []);
   
-  child.attr.className = child.attr.className
+  child.attributes.className = child.attributes.className
     .concat(resolved.classes.filter(function (cl) {
-      return child.attr.className.every(function (_cl) {
+      return child.attributes.className.every(function (_cl) {
         return _cl !== cl;
       });
     }));
 
-  if ( ! child.attr.id && resolved.id ) {
-    child.attr.id = resolved.id;
+  if ( ! child.attributes.id && resolved.id ) {
+    child.attributes.id = resolved.id;
   }
 
   // Open tag
@@ -79,26 +79,26 @@ function render (child, props, tab) {
 
   var classes;
 
-  if ( typeof child.attr === 'text' ) {
-    child.attr = { $text: child.attr };
+  if ( typeof child.attributes === 'text' ) {
+    child.attributes = { $text: child.attributes };
   }
 
-  if ( Object.keys(resolved.attr).lnegth ) {
-    for ( var key in resolved.attr ) {
-      if ( ! (key in child.attr) ) {
-        child.attr[key] = resolved.attr[key];
+  if ( resolved.attributes && Object.keys(resolved.attributes).length ) {
+    for ( var key in resolved.attributes ) {
+      if ( ! (key in child.attributes) ) {
+        child.attributes[key] = resolved.attributes[key];
       }
     }
   }
 
-  for ( var attr in child.attr ) {
+  for ( var attributes in child.attributes ) {
 
-    if ( attr === 'className' ) {
-      if ( typeof child.attr.className === 'string' ) {
-        classes = child.attr.className.split(/\s+/);
+    if ( attributes === 'className' ) {
+      if ( typeof child.attributes.className === 'string' ) {
+        classes = child.attributes.className.split(/\s+/);
       }
       else {
-        classes = child.attr.className;
+        classes = child.attributes.className;
       }
 
       if ( classes.length ) {
@@ -106,24 +106,24 @@ function render (child, props, tab) {
       }
     }
 
-    else if ( ! /^\$/.test(attr) ) {
+    else if ( ! /^\$/.test(attributes) ) {
     
-      if ( typeof child.attr[attr] === 'function' ) {
-        av = child.attr[attr](props);
+      if ( typeof child.attributes[attributes] === 'function' ) {
+        av = child.attributes[attributes](props);
       }
 
       else {
-        av = child.attr[attr];
+        av = child.attributes[attributes];
       }
 
       if ( av !== null && typeof av !== 'undefined' ) {
-        open += ' ' + attr + '="' + av + '"';
+        open += ' ' + attributes + '="' + av + '"';
       }
     }
     
   }
 
-  if ( child.attr.$selfClosing ) {
+  if ( child.attributes.$selfClosing ) {
     open += '/'
   }
 
@@ -131,16 +131,21 @@ function render (child, props, tab) {
   
   // lines.push(open);
 
-  if ( ! child.attr.$selfClosing ) {
+  if ( ! child.attributes.$selfClosing ) {
     
-    if ( child.attr.$text ) {
-      if ( typeof child.attr.$text === 'string' ) {
-        open += child.attr.$text + '</' + element + '>';
-      }
+    if ( child.textNode.length ) {
 
-      else if ( typeof child.attr.$text === 'function' ) {
-        open += child.attr.$text(props) + '</' + element + '>';
-      }
+      var text = child.textNode
+        .map(text => {
+          if ( typeof text === 'function' ) {
+            return text(props);
+          }
+          return text;
+        })
+        .filter(text => typeof text === 'string')
+        .join(child.textGlue);
+
+      open += text + '</' + element + '>';
 
       lines.push(open);
     }

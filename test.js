@@ -85,4 +85,30 @@
 
   p.render().replace(/(\n|\t)/g, '').should.be.exactly('<p>  <p class="p-in-p"></p></p>');
 
+  // attr()
+
+  p = new Element('p').attr('title', 'hello');
+
+  p.attr('title').should.be.exactly('hello');
+
+  p.attributes.title.should.be.exactly('hello');
+
+  p.render().should.be.exactly('<p title="hello"></p>');
+
+  // text()
+
+  p = new Element('p');
+
+  p.text('A');
+
+  p.text().should.be.exactly('A');
+
+  p.render().should.be.exactly('<p>A</p>');
+
+  p.text('B');
+
+  p.text().should.be.exactly('AB');
+
+  p.render().should.be.exactly('<p>AB</p>');
+
 } ();

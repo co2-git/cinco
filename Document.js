@@ -4,43 +4,23 @@ class Document {
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  constructor () {
-    var children = [];
-
-    for ( var i in arguments ) {
-
-      if ( Array.isArray(arguments[i]) ) {
-        children = children.concat(arguments[i]);
-      }
-
-      else {
-        children.push(arguments[i]);
-      }
-    }
-
-    if ( this instanceof Document === false ) {
-      return new Document(children);
-    }
-
-    this.children = children;
+  constructor (...children) {
+    this.children = children
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  add () {
-    for ( var i in arguments ) {
-      this.children.push(arguments[i]);
-    }
-
-    return this;1    
+  add (...children) {
+    this.children.push(...children)
+    return this;
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   find (selector) {
-    var found = [];
+    let found = [];
 
-    this.children.forEach(function (child) {
+    this.children.forEach(child => {
 
       if ( child instanceof Element ) {
         if ( child.is(selector) ) {
@@ -48,18 +28,16 @@ class Document {
         }
       }
 
-      child.find(selector).each(function (result) {
-        found.push(result);
-      });
-    });
+      child.find(selector).each(result => found.push(result));
+    })
 
-    return new Elements(found);
+    return new Elements(...found);
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   render (props) {
-    var l = [Document.doctype];
+    let l = [Document.doctype];
 
     l.push('<meta charset="utf-8" />');
 

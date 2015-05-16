@@ -72,17 +72,22 @@ class Element {
 
   constructor (selector, attr, children) {
     this.selector   =   selector;
-    this.attr       =   attr || {};
+    this.attributes =   attr || {};
     this.children   =   children || [];
     this.conditions =   [];
-    this.text       =   [];
+    this.textNode   =   [];
+    this.textGlue   =   '';
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   text (text) {
-    this.text.push(text);
-    return this;
+    if ( text ) {
+      this.textNode.push(text);
+      return this;
+    }
+
+    return this.textNode.join(this.textGlue);
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -116,7 +121,7 @@ class Element {
       this.children.forEach(child => findElements(selector, child));
     }
 
-    return new Elements(elements);
+    return new Elements(...elements);
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,14 +153,14 @@ class Element {
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   removeClass (className) {
-    if ( this.attr.className ) {
-      var classes = this.attr.className;
+    if ( this.attributes.className ) {
+      var classes = this.attributes.className;
 
-      if ( ! Array.isArray(this.attr.className) ) {
-        classes = this.attr.className.split(/\s+/)
+      if ( ! Array.isArray(this.attributes.className) ) {
+        classes = this.attributes.className.split(/\s+/)
       }
 
-      this.attr.className = classes
+      this.attributes.className = classes
         .filter(_className => _className !== className)
 
       let regexp = new RegExp('\.' + className + '(\.|#|\\[|$)', 'g');
@@ -172,6 +177,17 @@ class Element {
   condition (condition) {
     this.conditions.push(condition);
     return this
+  }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  attr (getter, setter) {
+    if ( '1' in arguments ) {
+      this.attributes[getter] = setter;
+      return this;
+    }
+
+    return this.attributes[getter];
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
