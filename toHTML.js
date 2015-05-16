@@ -3,8 +3,8 @@
 import Elements from './Elements'
 import Element from './Element'
 
-function toHTML (child, props, tab) {
-  
+function render (child, props, tab) {
+
   tab = tab || '';
 
   var lines = [];
@@ -23,7 +23,7 @@ function toHTML (child, props, tab) {
     return
       child
         .map(function (elem) {
-          return toHTML(elem, props);
+          return render(elem, props);
         })
         .join("\n");
   }
@@ -48,9 +48,15 @@ function toHTML (child, props, tab) {
     return '';
   }
 
+  // Resolve selector
+
   var resolved = Element.resolve(child.selector);
 
+  // Element
+
   var element = resolved.element || 'div';
+
+  // Class
 
   child.attr.className = (child.attr.className || []);
   
@@ -64,6 +70,8 @@ function toHTML (child, props, tab) {
   if ( ! child.attr.id && resolved.id ) {
     child.attr.id = resolved.id;
   }
+
+  // Open tag
 
   var open = tab + '<' + element;
 
@@ -150,10 +158,10 @@ function toHTML (child, props, tab) {
       }
 
       if ( Array.isArray(children) ) {
-        children = new Elements(children);
+        children = new Elements(...children);
       }
 
-      lines.push(children.toHTML(props, tab + "  "));
+      lines.push(children.render(props, tab + "  "));
 
       lines.push(tab + '</' + element + '>');
     }
@@ -170,4 +178,4 @@ function toHTML (child, props, tab) {
   return lines.join("\n");
 }
 
-export default toHTML
+export default render

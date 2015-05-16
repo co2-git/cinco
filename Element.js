@@ -1,7 +1,9 @@
 'use strict'
 
 class Element {
-  
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   static resolve (selector) {
     var resolved = { classes: [], attr: {} };
 
@@ -35,6 +37,8 @@ class Element {
     return resolved;
   }
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   static is (elem, selector) {
 
     var dest = Element.resolve(selector);
@@ -64,16 +68,24 @@ class Element {
     });
   }
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   constructor (selector, attr, children) {
     this.selector   =   selector;
     this.attr       =   attr || {};
     this.children   =   children || [];
+    this.conditions =   [];
+    this.text       =   [];
   }
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   text (text) {
-    this.attr.$text = text;
+    this.text.push(text);
     return this;
   }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   find (selector) {
     var elements = [];
@@ -101,34 +113,39 @@ class Element {
     }
 
     if ( Array.isArray(this.children) ) {
-      this.children.forEach(function (child) {
-        findElements(selector, child);
-      });
+      this.children.forEach(child => findElements(selector, child));
     }
 
     return new Elements(elements);
   }
 
-  add () {
-    for ( var i in arguments ) {
-      this.children.push(arguments[i])
-    }
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+  add (...children) {
+    this.children.push(...children)
     return this
   }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   is (selector) {
     return Element.is(this, selector);
   }
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   render (props, tab) {
-    return toHTML(this, props, tab);
+    return render(this, props, tab);
   }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   empty () {
     this.children = [];
     return this;
   }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   removeClass (className) {
     if ( this.attr.className ) {
@@ -149,9 +166,18 @@ class Element {
     }
     return this
   }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  condition (condition) {
+    this.conditions.push(condition);
+    return this
+  }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
 export default Element
 
-import toHTML from './toHTML'
+import render from './toHTML'
 import Elements from './Elements'
