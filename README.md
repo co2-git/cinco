@@ -17,25 +17,26 @@ let document = new Document();
 
 // Create a new HTML5 element
 
-let div = new Element('#main.my-div')
+let div = new Element('#main.my-div', { role: 'main' })
     .text(props => 'Hello ' + props.name);
 
 // Append div
 
-document.add(form.add(input))
+document.add(div)
 
 // Search in document
 
 document.find('.my-div').is('#main') // true
 
 // Render to HTML string
+
 document.render({ name: 'Funny Bear' }) // see results below
 ```
 
 ```html
 <!doctype html>
 <meta charset="utf-8" />
-<div>Hello Funny Bear</div>
+<div id="main" class="my-div" role="main">Hello Funny Bear</div>
 ```
 
 # Element
