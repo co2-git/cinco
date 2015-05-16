@@ -5,7 +5,7 @@ class Element {
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   static resolve (selector) {
-    var resolved = { classes: [], attr: {} };
+    var resolved = { classes: [], attr: {}, element: 'div' };
 
     var trans = selector
       .replace(/\./g, '|.')
@@ -70,24 +70,104 @@ class Element {
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+  get classes () {
+    let classes = []
+
+    if ( this.attributes && this.attributes.className ) {
+
+      if ( typeof this.attributes.className === 'function' ) {
+        this.attributes.className = [this.attributes.className];
+      }
+
+      if ( typeof this.attributes.className === 'string' ) {
+        this.attributes.className = this.attributes.className.split(/\s+/)
+      }
+
+      if ( Array.isArray(this.attributes.className) ) {
+        classes = this.attributes.className;
+      }
+    }
+
+    return classes
+  }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   constructor (selector, attr, children) {
     this.selector   =   selector;
     this.attributes =   attr || {};
     this.children   =   children || [];
     this.conditions =   [];
-    this.textNode   =   [];
-    this.textGlue   =   '';
+    this.textNode   =   ''
+
+    let resolve = Element.resolve(selector)
+
+    for ( var i in resolve.attr ) {
+      if ( ! ( i in this.attr ) ) {
+        this.attr[i] = resolve.attr[i];
+      }
+    }
+
+    if ( resolve.classes.length ) {
+      this.classes;
+      this.attributes.className =  this.attributes.className || [];
+      this.attributes.className = this.attributes.className.concat(
+        resolve.classes.filter(className =>
+          this.classes.every(attrClass => attrClass !== className )));
+    }
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   text (text) {
     if ( text ) {
-      this.textNode.push(text);
+      this.textNode = text;
       return this;
     }
 
-    return this.textNode.join(this.textGlue);
+    return this.textNode;
+  }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  findByText (text) {
+    var elements = [];
+
+    function findElements (text, element) {
+
+      if ( element instanceof Element ) {
+        if ( text instanceof RegExp ) {
+          if ( text.test(element.textNode) ) {
+            elements.push(element);
+          }
+        }
+
+        else if ( typeof text === 'string' ) {
+          if ( text === element.textNode ) {
+            elements.push(element);
+          }
+        }
+
+        if ( Array.isArray(element.children) ) {
+          element.children.forEach(function (child) {
+            findElements(text, child);
+          });
+        }
+      }
+
+      else if ( element instanceof Elements ) {
+        element.each(function (child) {
+          findElements(text, child);
+        });
+      }
+
+    }
+
+    if ( Array.isArray(this.children) ) {
+      this.children.forEach(child => findElements(text, child));
+    }
+
+    return new Elements(...elements);
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -152,14 +232,24 @@ class Element {
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+  remove (fn) {
+    this.children = this.children.filter(child => fn(child) ? false : true  );
+    return this;
+  }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  hasClass (className) {
+    return this.classes.some(attrClass => attrClass === className)
+  }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   removeClass (className) {
-    if ( this.attributes.className ) {
-      var classes = this.attributes.className;
 
-      if ( ! Array.isArray(this.attributes.className) ) {
-        classes = this.attributes.className.split(/\s+/)
-      }
+    let { classes } = this
 
+    if ( classes.length ) {
       this.attributes.className = classes
         .filter(_className => _className !== className)
 
@@ -169,14 +259,29 @@ class Element {
         this.selector = this.selector.replace(regexp, '');
       }
     }
+
     return this
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  condition (condition) {
-    this.conditions.push(condition);
+  condition (...conditions) {
+    this.conditions.push(...conditions);
     return this
+  }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  satisfies (props) {
+    return this.conditions.every(condition => {
+      if ( typeof condition === 'function' ) {
+        return condition(props);
+      }
+      if ( typeof condition === 'boolean' ) {
+        return condition;
+      }
+      return false;
+    });
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

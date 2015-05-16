@@ -74,7 +74,7 @@ let myElement = new Element('a', { 'href': '/users', 'target': '_blank' });
 console.log(myElement.render()); // <a href="/" target="_blank"></a>
 
 // You can also use the `attr` method
-let myElement = new Element('a').attr('href', '/users').attr('target', '_blank');
+let myElement = new Element('a').attr('href', '/users');
 
 console.log(myElement.render()); // <a href="/" target="_blank"></a>
 
@@ -103,36 +103,18 @@ let myElement = new Element('a', props =>
 );
 console.log(myElement.render(props)); // <a href="/users/123"></a>
 
-// Use functions per attrubute
+// Use functions per attribute
 let myElement = new Element('a', { href: props => '/users/' + props.user.id });
 console.log(myElement.render(props)); // <a href="/users/123"></a>
 ```
 
-# Meta attributes
-
-Attributes which key names start with `$` are special attributes to rapidhtml and therefore are not rendered to HTML:
-
-```js
-let myElement = new Element('div', { role: 'main', $foo: 'barz' });
-console.log(myElement.render()); // <div role="main"></div>
-```
-
-| Meta attribute | Example                                    | HTML          |
-|----------------|--------------------------------------------|---------------|
-| $text          | `new Element('p', { $text: 'abc' })`       | `<p>abc</p>`  |
-| $condition     | `new Element('p', { $condition: false })`  | ``            |
-| $selfClosing   | `new Element('p', { $selfClosing: true })` | `<p />`       |
-| $data          | `new Element('p', { $data: { foo: 'bar' } })`| `<p data-foo="bar"></p>` |
-
 # Manipulate text
 
 ```js
-// Setter with the meta attribute syntax
-let p = new Element('p', { $text: 'Hello world!'});
-console.log(p.render()); // <p>Hello world!</p>
+let p = new Element('p');
 
-// Setter with the text method
-let p = new Element('p').text('Hello world!');
+// Setter
+p.text('Hello world!')
 console.log(p.render()); // <p>Hello world!</p>
 
 // Gettter
@@ -141,22 +123,32 @@ console.log(p.text()); // Hello world!
 
 # Conditional rendering
 
-The meta attribute `$condition`, if evaluated to false, will skip the rendering of the element.
+The conditions, if one evaluated to false, will skip the rendering of the element.
 
 ```js
-let element = new Element('p', { $condition: true });
+let element = new Element('p').condition(true);
 element.render(); // <p></p>
 
-let element = new Element('p', { $condition: false });
+let element = new Element('p').condition(false);
 element.render(); // 
 
-// You can also pass a function for fine-grain control
+// You can use functions
 
-let element = new Element('p',
-    { $condition: props => props.isTrue })
+let element = new Element('p').condition(props => props.score > 100);
 
-element.render({ isTrue: true }); // will render
-element.render({ isTrue: false }); // will **not** render
+element.render({ score: 200 }); // <p></p>
+
+// Whether or not all conditions return to true
+
+element.satisfies(); // true|false
+
+// With props
+
+let p = new Element('p')
+    .condition(props => props.score > 100)
+    .condition(props => props.average > 1000);
+
+p.statisfies({ score: 500, average: 250 }); // false
 ```
 
 # Append children
@@ -185,14 +177,6 @@ form.render();
 </form>
 ```
 
-# Various ways of appending children
-
-```js
-form.add(input);        // append()
-form.append(input);
-form.prepend(input);
-```
-
 # Clearing all children
 
 ```js
@@ -208,12 +192,20 @@ form.empty();
 form.render(); // <form></form>
 ```
 
-# Remove an element
+# Remove a child
 
 ```js
-form.remove();
-// Or
-delete form
+let form = new Element('form');
+let fieldset = new Element('fieldset');
+
+form.add(fieldset);
+
+form.render(); // <form><fieldset></fieldset></form>
+
+// Act like an array filter() => true gets removed
+form.remove(child => child.is('fieldset'));
+
+form.render(); // <form></form>
 ```
 
 # Find
@@ -230,10 +222,17 @@ let form = new Element('form').add(
     )
 );
 
-// Add text to button
+// Find button and add text to it
 
-form.find('button').text('Click me!');
-form.find({ $text: 'Click me!' });
+form.find('button').each(button => button.text('Click me!'));
+
+// Find an element by text
+
+form.findByText('Click me!');
+
+// Find an element by text using a regex
+
+form.findByText(/click/i);
 ```
 
 # Classes
@@ -243,4 +242,6 @@ let elem = new Element('.c1', { className: 'c2 c3' }); // <div class="c1 c2 c3">
 let elem = new Element('.c1', { className: ['c2', 'c3'] }); // <div class="c1 c2 c3"></div>
 let elem = new Element('.c1').addClass('c2', 'c3'); // <div class="c1 c2 c3"></div>
 elem.removeClass('c3'); // <div class="c1 c2"></div>
+
+elem.hasClass('c3'); // false
 ```

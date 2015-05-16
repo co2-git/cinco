@@ -22,9 +22,7 @@ function render (child, props, tab) {
   if ( Array.isArray(child) ) {
     return
       child
-        .map(function (elem) {
-          return render(elem, props);
-        })
+        .map(elem => render(elem, props))
         .join("\n");
   }
 
@@ -34,15 +32,7 @@ function render (child, props, tab) {
 
   // Can we transform this Element?
 
-  var cont = true;
-
-  if ( typeof child.attributes.$condition === 'function' ) {
-    cont = child.attributes.$condition(props);
-  }
-
-  else if ( typeof child.attributes.$condition === 'boolean' ) {
-    cont = child.attributes.$condition;
-  }
+  var cont = child.satisfies(props);
 
   if ( ! cont ) {
     return '';
@@ -56,17 +46,6 @@ function render (child, props, tab) {
 
   var element = resolved.element || 'div';
 
-  // Class
-
-  child.attributes.className = (child.attributes.className || []);
-  
-  child.attributes.className = child.attributes.className
-    .concat(resolved.classes.filter(function (cl) {
-      return child.attributes.className.every(function (_cl) {
-        return _cl !== cl;
-      });
-    }));
-
   if ( ! child.attributes.id && resolved.id ) {
     child.attributes.id = resolved.id;
   }
@@ -75,9 +54,7 @@ function render (child, props, tab) {
 
   var open = tab + '<' + element;
 
-  var av;
-
-  var classes;
+  var attributeValue;
 
   if ( typeof child.attributes === 'text' ) {
     child.attributes = { $text: child.attributes };
@@ -91,33 +68,35 @@ function render (child, props, tab) {
     }
   }
 
+  // Class
+
+  let classes = child.classes.concat(
+    resolved.classes.filter(cl => 
+      child.classes.every(_cl => _cl !== cl)
+    ))
+
+  if ( classes.length ) {
+    open += ' class="' + classes.join(' ') + '"';
+  }
+
   for ( var attributes in child.attributes ) {
 
     if ( attributes === 'className' ) {
-      if ( typeof child.attributes.className === 'string' ) {
-        classes = child.attributes.className.split(/\s+/);
-      }
-      else {
-        classes = child.attributes.className;
-      }
-
-      if ( classes.length ) {
-        open += ' class="' + classes.join(' ') + '"';
-      }
+      continue;
     }
 
-    else if ( ! /^\$/.test(attributes) ) {
+    else {
     
       if ( typeof child.attributes[attributes] === 'function' ) {
-        av = child.attributes[attributes](props);
+        attributeValue = child.attributes[attributes](props);
       }
 
       else {
-        av = child.attributes[attributes];
+        attributeValue = child.attributes[attributes];
       }
 
-      if ( av !== null && typeof av !== 'undefined' ) {
-        open += ' ' + attributes + '="' + av + '"';
+      if ( attributeValue !== null && typeof attributeValue !== 'undefined' ) {
+        open += ' ' + attributes + '="' + attributeValue + '"';
       }
     }
     
@@ -133,17 +112,13 @@ function render (child, props, tab) {
 
   if ( ! child.attributes.$selfClosing ) {
     
-    if ( child.textNode.length ) {
+    if ( child.textNode ) {
 
-      var text = child.textNode
-        .map(text => {
-          if ( typeof text === 'function' ) {
-            return text(props);
-          }
-          return text;
-        })
-        .filter(text => typeof text === 'string')
-        .join(child.textGlue);
+      var text = child.textNode;
+
+      if ( typeof text === 'function' ) {
+        text = text(props);
+      }
 
       open += text + '</' + element + '>';
 
