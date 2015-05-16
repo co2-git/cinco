@@ -43,8 +43,6 @@ class Document {
 
     l = l.concat( this.children.map( child => child.render(props) ) );
 
-    l.push(new Elements().render(props));
-
     return l.join("\n");
   }
 
