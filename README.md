@@ -9,43 +9,33 @@ Example on how to create a HTML5 document and then render it to string
 
 ```js
 
-import { Document, Element } from cinco
+import { Document, Element } from cinco;
 
 // Create a new HTML5 document
 
-let document = new Document()
+let document = new Document();
 
-// Create a new form element
+// Create a new HTML5 element
 
-let form = new Element('form#form-1', {
-    method          :   'POST',
-    novalidate      :   true,
-    role            :   'form'
-})
+let div = new Element('#main.my-div')
+    .text(props => 'Hello ' + props.name);
 
-//
+// Append div
 
-let input = new Element('input.form-email', {
-    type            :   'email',
-    name            :   'email',
-    required        :   true,
-    value           :   props => "hello " + props.name
-    })
-// Append children
 document.add(form.add(input))
 
 // Search in document
-document.find('.form-email').is('[required]') // true
+
+document.find('.my-div').is('#main') // true
 
 // Render to HTML string
-document.render({ name: 'github user' }) // see results below
+document.render({ name: 'Funny Bear' }) // see results below
 ```
 
 ```html
 <!doctype html>
-<form id="form-1" method="POST" novalidate role="form" name="login">
-    <input class="form-email" type="email" name="email" required value="hello github user" />
-</form>
+<meta charset="utf-8" />
+<div>Hello Funny Bear</div>
 ```
 
 # Element
