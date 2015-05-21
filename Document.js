@@ -1,5 +1,7 @@
 'use strict'
 
+import Streamable from './Streamable';
+
 class Document {
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -36,14 +38,19 @@ class Document {
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  render (props) {
-    let l = [Document.doctype];
+  render (glue) {
 
-    l.push('<meta charset="utf-8" />');
+    if ( typeof glue !== 'string' ) {
+      glue = "\n";
+    }
 
-    l = l.concat( this.children.map( child => child.render(props) ) );
+    let lines = [];
 
-    return l.join("\n");
+    lines.push(Document.doctype, '<meta charset="utf-8" />');
+
+    lines.push(new Elements(...this.children).render());
+
+    return lines.join(glue);
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

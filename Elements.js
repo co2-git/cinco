@@ -55,21 +55,30 @@ class Elements {
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  render (props, tab) {
-    return this.elements
+  render (tab, glue) {
+
+    tab = tab || '';
+
+    if ( typeof glue !== 'string' ) {
+      glue = "\n";
+    }
+    
+    let lines = [];
+
+    this.elements
       
       .map(element => {
         if ( typeof element === 'function' ) {
-          element = element(props);
+          element = element();
         }
         return element;
       })
 
       .filter(element => element instanceof Element || element instanceof Elements)
 
-      .map(element => element.render(props, tab))
+      .forEach(element => lines.push(element.render(tab, glue)));
 
-      .join("\n")
+    return lines.join(glue);
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -86,4 +95,5 @@ class Elements {
 
 export default Elements
 
-import Element from './Element'
+import Element from './Element';
+import Streamable from './Streamable';

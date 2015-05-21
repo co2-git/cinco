@@ -1,15 +1,18 @@
 'use strict'
 
+import { Streamable } from './Streamable';
+
 class Element {
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   static resolve (selector) {
-    var resolved = { classes: [], attr: {}, element: 'div' };
+    var resolved = { classes: [], attributes: {} };
 
     var trans = selector
       .replace(/\./g, '|.')
-      .replace(/#/g, '|#');
+      .replace(/#/g, '|#')
+      .replace(/\[/g, '|[');
 
     var bits = trans.split(/\|/);
 
@@ -24,8 +27,9 @@ class Element {
       }
 
       else if ( /^\[.+\]$/.test(bit) ) {
-        var attrBits = bit.split('=');
-        resolved.attr[attrBits[0]] = attrBits[1];
+        var attrBits = bit.replace(/^\[/, '').replace(/\]$/, '').split('=');
+        resolved.attributes[attrBits[0]] = typeof attrBits[1] === 'undefined'
+          ? true : attrBits[1];
       }
 
       else if ( /^[A-Za-z-_\$]/.test(bit) ) {
@@ -219,8 +223,27 @@ class Element {
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  render (props, tab) {
-    return render(this, props, tab);
+  close () {
+    this.closed = true;
+    return this;
+  }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  render (tab) {
+    return new Compiler(this).render(tab);
+  }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  stream () {
+    let stream = new Streamable();
+
+    this.children.forEach(child => 
+      child.stream().on('data', data => stream.addLine(data))
+    );
+
+    return stream;
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -241,6 +264,13 @@ class Element {
 
   hasClass (className) {
     return this.classes.some(attrClass => attrClass === className)
+  }
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  addClass (...classes) {
+    this.classes.push(...classes);
+    return this;
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -300,5 +330,5 @@ class Element {
 
 export default Element
 
-import render from './toHTML'
+import Compiler from './Compiler'
 import Elements from './Elements'

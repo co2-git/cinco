@@ -17,7 +17,7 @@
 
   // new Document.render()
 
-  var lines = document.render().split(/\n/)
+  var lines = document.render().split(/\n/);
 
   lines[0].should.be.exactly(Document.doctype);
 
