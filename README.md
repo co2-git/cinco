@@ -13,15 +13,17 @@ import { Document, Element } from cinco;
 
 // Create a new HTML5 document
 
-let document = new Document();
+let document = new Document()
 
-// Create a new HTML5 element
+    .add(
+        new Element('title').text('Good morning')
+    );
 
-let title = new Element('title').text('Hello');
+// Update DOM
 
-// Append div
-
-document.add(div);
+if ( new Date().getHours > 12 ) {
+    document.find('title').get(0).text('Good evening');
+}
 
 // Render to string
 
@@ -31,7 +33,7 @@ document.render(); // see results below
 ```html
 <!doctype html>
 <meta charset="utf-8" />
-<title>Hello</title>
+<title>Good morning</title>
 ```
 
 # ES5 support

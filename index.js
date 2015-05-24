@@ -3,14 +3,14 @@
 import Element from './Element';
 import Elements from './Elements';
 import Document from './Document';
-import toHTML from './toHTML';
+import Compiler from './Compiler';
 
 function Cinco () {
   this.Element     =   Element;
   this.Elements    =   Elements;
   this.Document    =   Document;
-  this.toHTML      =   toHTML;
-  this.render      =   toHTML;
+  this.Compiler    =   Compiler;
+  this.render      =   Compiler;
 }
 
 let cinco = new Cinco();
