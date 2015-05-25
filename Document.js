@@ -1,7 +1,5 @@
 'use strict'
 
-import Streamable from './Streamable';
-
 class Document {
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
