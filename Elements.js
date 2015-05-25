@@ -96,4 +96,3 @@ class Elements {
 export default Elements
 
 import Element from './Element';
-import Streamable from './Streamable';

@@ -1,7 +1,5 @@
 'use strict'
 
-import { Streamable } from './Streamable';
-
 class Element {
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -232,18 +230,6 @@ class Element {
 
   render (tab) {
     return new Compiler(this).render(tab);
-  }
-
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  stream () {
-    let stream = new Streamable();
-
-    this.children.forEach(child => 
-      child.stream().on('data', data => stream.addLine(data))
-    );
-
-    return stream;
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
