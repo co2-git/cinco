@@ -13,10 +13,6 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _Streamable = require('./Streamable');
-
-var _Streamable2 = _interopRequireDefault(_Streamable);
-
 var _Elements = require('./Elements');
 
 var _Elements2 = _interopRequireDefault(_Elements);

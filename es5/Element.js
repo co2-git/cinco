@@ -11,8 +11,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _Streamable = require('./Streamable');
-
 var _Compiler = require('./Compiler');
 
 var _Compiler2 = _interopRequireDefault(_Compiler);
@@ -208,22 +206,6 @@ var Element = (function () {
 
     value: function render(tab) {
       return new _Compiler2['default'](this).render(tab);
-    }
-  }, {
-    key: 'stream',
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    value: function stream() {
-      var stream = new _Streamable.Streamable();
-
-      this.children.forEach(function (child) {
-        return child.stream().on('data', function (data) {
-          return stream.addLine(data);
-        });
-      });
-
-      return stream;
     }
   }, {
     key: 'empty',

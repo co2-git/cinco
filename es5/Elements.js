@@ -15,10 +15,6 @@ var _Element = require('./Element');
 
 var _Element2 = _interopRequireDefault(_Element);
 
-var _Streamable = require('./Streamable');
-
-var _Streamable2 = _interopRequireDefault(_Streamable);
-
 var Elements = (function () {
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
