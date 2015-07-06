@@ -39,7 +39,7 @@ document.render(); // see results below
 # ES5 support
 
 ```js
-var cinco = require('cinco/es5'),
+var cinco = require('cinco/dist'),
     Element = cinco.Element,
     Document = cinco.Document;
 ```
