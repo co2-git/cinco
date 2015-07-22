@@ -265,10 +265,10 @@ var Element = (function () {
           return _className !== className;
         });
 
-        var regexp = new RegExp('.' + className + '(.|#|\\[|$)', 'g');
+        var regexp = new RegExp('(.' + className + ')(.|#|\\[|$)', 'g');
 
         if (regexp.test(this.selector)) {
-          this.selector = this.selector.replace(regexp, '');
+          this.selector = this.selector.replace(regexp, '$2');
         }
       }
 
