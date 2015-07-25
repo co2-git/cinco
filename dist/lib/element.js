@@ -23,14 +23,19 @@ var Element = (function () {
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  function Element(selector, attr, children) {
+  function Element() {
+    var selector = arguments[0] === undefined ? 'div' : arguments[0];
+
     var _this = this;
+
+    var attr = arguments[1] === undefined ? {} : arguments[1];
+    var children = arguments[2] === undefined ? [] : arguments[2];
 
     _classCallCheck(this, Element);
 
     this.selector = selector;
-    this.attributes = attr || {};
-    this.children = children || [];
+    this.attributes = attr;
+    this.children = children;
     this.conditions = [];
     this.textNode = '';
 
